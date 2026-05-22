@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AASTMT - Grade Rostering Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #002060;
+            --navy-dark: #001540;
+            --navy-light: #003090;
+            --gold: #C9A227;
+            --gold-light: #E8C84A;
+            --gold-dark: #A8841E;
+            --bg: #0a1628;
+            --card: rgba(255,255,255,0.04);
+            --card-border: rgba(201,162,39,0.15);
+            --text: #e8eaf0;
+            --text-muted: #8892a4;
+            --success: #22c55e;
+            --error: #ef4444;
+            --radius: 16px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Cairo', 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Background pattern */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background: 
+                radial-gradient(ellipse at 20% 0%, rgba(0,32,96,0.6) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(201,162,39,0.1) 0%, transparent 50%);
+            z-index: 0;
+        }
+        .page { position: relative; z-index: 1; }
+
+        /* ===== LOGIN PAGE ===== */
+        #loginPage {
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh; padding: 20px;
+        }
+        .login-container {
+            width: 100%; max-width: 440px;
+            animation: slideUp 0.8s ease;
+        }
+        @keyframes slideUp {
+            from { opacity:0; transform: translateY(40px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+        .login-logo {
+            text-align: center; margin-bottom: 40px;
+        }
+        .login-logo .shield {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            border-radius: 20px; margin: 0 auto 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; color: var(--navy);
+            box-shadow: 0 8px 32px rgba(201,162,39,0.3);
+        }
+        .login-logo h1 {
+            font-size: 22px; font-weight: 900; color: var(--gold);
+            letter-spacing: 2px;
+        }
+        .login-logo p {
+            color: var(--text-muted); font-size: 14px; margin-top: 6px;
+        }
+        .login-card {
+            background: linear-gradient(145deg, rgba(0,32,96,0.4), rgba(0,21,64,0.6));
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius); padding: 40px 32px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+        }
+        .login-card h2 {
+            font-size: 20px; margin-bottom: 8px; color: #fff;
+        }
+        .login-card .subtitle {
+            color: var(--text-muted); font-size: 14px; margin-bottom: 28px;
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block; font-size: 13px; font-weight: 600;
+            color: var(--text-muted); margin-bottom: 8px;
+        }
+        .form-group input {
+            width: 100%; padding: 14px 16px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; color: #fff;
+            font-family: 'Cairo', sans-serif; font-size: 15px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201,162,39,0.15);
+            background: rgba(255,255,255,0.08);
+        }
+        .login-btn {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            border: none; border-radius: 10px;
+            color: var(--navy-dark); font-family: 'Cairo', sans-serif;
+            font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: all 0.3s;
+            margin-top: 8px;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(201,162,39,0.35);
+        }
+        .login-error {
+            color: var(--error); font-size: 13px;
+            text-align: center; margin-top: 14px;
+            min-height: 20px;
+        }
+
+        /* ===== DASHBOARD PAGE ===== */
+        #dashboardPage { display: none; }
+        .top-bar {
+            background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+            border-bottom: 2px solid var(--gold);
+            padding: 16px 40px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .top-bar .brand {
+            display: flex; align-items: center; gap: 14px;
+        }
+        .top-bar .brand .icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            border-radius: 10px; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 20px; color: var(--navy);
+        }
+        .top-bar .brand h1 {
+            font-size: 17px; color: var(--gold); font-weight: 700;
+        }
+        .top-bar .brand span {
+            font-size: 12px; color: var(--text-muted);
+        }
+        .top-bar .user-info {
+            display: flex; align-items: center; gap: 10px;
+            color: var(--text-muted); font-size: 13px;
+        }
+        .top-bar .user-avatar {
+            width: 36px; height: 36px;
+            background: rgba(201,162,39,0.2);
+            border: 1px solid var(--gold);
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 14px; color: var(--gold);
+        }
+        .dashboard-content {
+            max-width: 1000px; margin: 0 auto;
+            padding: 32px 24px;
+            animation: slideUp 0.6s ease;
+        }
+        .info-bar {
+            display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap;
+        }
+        .info-chip {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 10px; padding: 14px 20px;
+            flex: 1; min-width: 180px;
+        }
+        .info-chip .label { font-size: 12px; color: var(--text-muted); }
+        .info-chip .value { font-size: 18px; font-weight: 700; color: var(--gold); margin-top: 4px; }
+        .table-card {
+            background: linear-gradient(145deg, rgba(0,32,96,0.3), rgba(0,21,64,0.4));
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+        }
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(201,162,39,0.1);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .table-header h2 { font-size: 18px; color: #fff; }
+        .table-header .counter {
+            font-size: 13px; color: var(--text-muted);
+            background: rgba(255,255,255,0.05);
+            padding: 6px 14px; border-radius: 20px;
+        }
+        .table-header .counter b { color: var(--gold); }
+        table {
+            width: 100%; border-collapse: collapse;
+        }
+        thead th {
+            padding: 14px 16px; font-size: 13px;
+            color: var(--gold); font-weight: 600;
+            text-align: right;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(201,162,39,0.1);
+        }
+        tbody tr {
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.2s;
+        }
+        tbody tr:hover { background: rgba(201,162,39,0.04); }
+        tbody td {
+            padding: 12px 16px; font-size: 14px;
+        }
+        td .row-num {
+            width: 28px; height: 28px;
+            background: rgba(201,162,39,0.1);
+            border-radius: 8px; display: inline-flex;
+            align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: var(--gold);
+        }
+        td .student-name { font-weight: 600; }
+        td .reg-num { color: var(--text-muted); font-size: 13px; font-family: 'Inter', monospace; }
+        .grade-input {
+            width: 80px; padding: 10px 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 8px; color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px; font-weight: 600;
+            text-align: center; transition: all 0.3s;
+        }
+        .grade-input:focus {
+            outline: none; border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201,162,39,0.15);
+        }
+        .grade-input.valid {
+            border-color: var(--success);
+            background: rgba(34,197,94,0.08);
+        }
+        .grade-input.invalid {
+            border-color: var(--error);
+            background: rgba(239,68,68,0.08);
+            animation: shake 0.4s;
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+        .submit-area {
+            padding: 24px; text-align: center;
+            border-top: 1px solid rgba(201,162,39,0.1);
+        }
+        #submitBtn {
+            padding: 14px 48px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            border: none; border-radius: 10px;
+            color: var(--navy-dark); font-family: 'Cairo', sans-serif;
+            font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: all 0.3s;
+        }
+        #submitBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(201,162,39,0.35);
+        }
+        #submitBtn:disabled {
+            opacity: 0.4; cursor: not-allowed;
+        }
+        .submit-msg {
+            font-size: 13px; margin-top: 10px;
+            min-height: 20px;
+        }
+
+        /* ===== SUCCESS MODAL ===== */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7); z-index: 100;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(6px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: linear-gradient(145deg, var(--navy), var(--navy-dark));
+            border: 1px solid var(--gold);
+            border-radius: 20px; padding: 48px 40px;
+            text-align: center; max-width: 420px;
+            animation: slideUp 0.5s ease;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+        }
+        .modal-box .check {
+            width: 72px; height: 72px;
+            background: linear-gradient(135deg, var(--success), #16a34a);
+            border-radius: 50%; margin: 0 auto 24px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; color: #fff;
+        }
+        .modal-box h2 { font-size: 22px; color: var(--gold); margin-bottom: 10px; }
+        .modal-box p { color: var(--text-muted); font-size: 14px; line-height: 1.8; }
+        .modal-box button {
+            margin-top: 24px; padding: 12px 36px;
+            background: rgba(201,162,39,0.15);
+            border: 1px solid var(--gold);
+            border-radius: 10px; color: var(--gold);
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .modal-box button:hover {
+            background: rgba(201,162,39,0.25);
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="page">
+    <div class="login-container">
+        <div class="login-logo">
+            <div class="shield">🎓</div>
+            <h1>AASTMT</h1>
+            <p>Arab Academy for Science, Technology & Maritime Transport</p>
+        </div>
+        <div class="login-card">
+            <h2>تسجيل الدخول</h2>
+            <p class="subtitle">بوابة رصد الدرجات — أعضاء هيئة التدريس</p>
+            <div class="form-group">
+                <label for="username">اسم المستخدم</label>
+                <input type="text" id="username" placeholder="أدخل اسم المستخدم" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="password">كلمة المرور</label>
+                <input type="password" id="password" placeholder="أدخل كلمة المرور">
+            </div>
+            <button class="login-btn" id="loginBtn" onclick="handleLogin()">تسجيل الدخول</button>
+            <div class="login-error" id="loginError"></div>
+        </div>
+    </div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div id="dashboardPage" class="page">
+    <div class="top-bar">
+        <div class="brand">
+            <div class="icon">🎓</div>
+            <div>
+                <h1>AASTMT Grades Portal</h1>
+                <span>بوابة رصد الدرجات الإلكترونية</span>
+            </div>
+        </div>
+        <div class="user-info">
+            <span>Dr. Ahmed</span>
+            <div class="user-avatar">👤</div>
+        </div>
+    </div>
+    <div class="dashboard-content">
+        <div class="info-bar">
+            <div class="info-chip">
+                <div class="label">المادة</div>
+                <div class="value">Software Process</div>
+            </div>
+            <div class="info-chip">
+                <div class="label">عدد الطلاب</div>
+                <div class="value">15 طالب</div>
+            </div>
+            <div class="info-chip">
+                <div class="label">الدرجة الكلية</div>
+                <div class="value">30 درجة</div>
+            </div>
+        </div>
+        <div class="table-card">
+            <div class="table-header">
+                <h2>📋 جدول رصد الدرجات</h2>
+                <div class="counter">مكتمل: <b id="filledCount">0</b> / 15</div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>اسم الطالب</th>
+                        <th>رقم التسجيل</th>
+                        <th>الدرجة (من 30)</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsBody"></tbody>
+            </table>
+            <div class="submit-area">
+                <button id="submitBtn" disabled onclick="handleSubmit()">✅ تأكيد ورصد الدرجات</button>
+                <div class="submit-msg" id="submitMsg"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal-box">
+        <div class="check">✓</div>
+        <h2>تم رصد الدرجات بنجاح!</h2>
+        <p>تم إدخال درجات <b>15 طالب</b> بنجاح في النظام.<br>يمكنك مراجعة النتائج من لوحة التحكم.</p>
+        <button onclick="document.getElementById('successModal').classList.remove('active')">إغلاق</button>
+    </div>
+</div>
+
+<script>
+const students = [
+    { name: "أحمد محمد علي", reg: "2210080001" },
+    { name: "منة الله خالد", reg: "2210080002" },
+    { name: "عمر إبراهيم حسن", reg: "2210080003" },
+    { name: "فاطمة سامي رضا", reg: "2210080004" },
+    { name: "محمود طارق عبد الله", reg: "2210080005" },
+    { name: "نورهان أحمد فؤاد", reg: "2210080006" },
+    { name: "كريم وليد مصطفى", reg: "2210080007" },
+    { name: "مريم حسين محمود", reg: "2210080008" },
+    { name: "يوسف عادل السيد", reg: "2210080009" },
+    { name: "دينا رامي الجمال", reg: "2210080010" },
+    { name: "زياد سعيد عثمان", reg: "2210080011" },
+    { name: "سارة حاتم النجار", reg: "2210080012" },
+    { name: "عبد الرحمن علاء", reg: "2210080013" },
+    { name: "هنا ياسر الشريف", reg: "2210080014" },
+    { name: "مصطفى أسامة قاسم", reg: "2210080015" }
+];
+
+// Build table
+const tbody = document.getElementById('studentsBody');
+students.forEach((s, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td><span class="row-num">${i + 1}</span></td>
+        <td><span class="student-name">${s.name}</span></td>
+        <td><span class="reg-num">${s.reg}</span></td>
+        <td><input type="number" class="grade-input" id="grade-${i + 1}" 
+             min="0" max="30" step="0.5" placeholder="—"
+             oninput="validateGrade(this)" onblur="validateGrade(this)"></td>
+    `;
+    tbody.appendChild(tr);
+});
+
+// Login
+function handleLogin() {
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    const err = document.getElementById('loginError');
+    if (u === 'doctor' && p === '1234') {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('dashboardPage').style.display = 'block';
+    } else {
+        err.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
+        document.getElementById('password').value = '';
+    }
+}
+
+// Allow Enter key on login
+document.getElementById('password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+});
+document.getElementById('username').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('password').focus();
+});
+
+// Validate grade
+function validateGrade(input) {
+    const val = parseFloat(input.value);
+    input.classList.remove('valid', 'invalid');
+    if (input.value === '') return updateCounter();
+    if (isNaN(val) || val < 0 || val > 30 || (val * 2) % 1 !== 0) {
+        input.classList.add('invalid');
+    } else {
+        input.classList.add('valid');
+    }
+    updateCounter();
+}
+
+function updateCounter() {
+    const inputs = document.querySelectorAll('.grade-input');
+    let filled = 0;
+    inputs.forEach(inp => { if (inp.classList.contains('valid')) filled++; });
+    document.getElementById('filledCount').textContent = filled;
+    document.getElementById('submitBtn').disabled = filled < 15;
+    const msg = document.getElementById('submitMsg');
+    if (filled < 15) {
+        msg.textContent = `⏳ متبقي ${15 - filled} طالب`;
+        msg.style.color = 'var(--text-muted)';
+    } else {
+        msg.textContent = '✅ جميع الدرجات مكتملة — يمكنك الرصد الآن';
+        msg.style.color = 'var(--success)';
+    }
+}
+
+// Submit
+function handleSubmit() {
+    const inputs = document.querySelectorAll('.grade-input');
+    let allValid = true;
+    inputs.forEach(inp => { if (!inp.classList.contains('valid')) allValid = false; });
+    if (!allValid) return;
+    document.getElementById('successModal').classList.add('active');
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').textContent = '✅ تم الرصد';
+}
+</script>
+</body>
+</html>
