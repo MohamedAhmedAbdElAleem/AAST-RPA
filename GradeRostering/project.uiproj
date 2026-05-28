@@ -1,0 +1,6 @@
+{
+  "Name": "GradeRostering",
+  "ProjectType": "Process",
+  "Description": "GradeRostering",
+  "MainFile": "Main.xaml"
+}
